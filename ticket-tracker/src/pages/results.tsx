@@ -1,9 +1,9 @@
 import { useSearchParams } from "next/navigation"
 import Link from "next/link";
 import { AnchorHTMLAttributes, DetailedHTMLProps, useEffect, useState } from "react";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel } from '@mui/x-data-grid';
-import { ThemeProvider } from "@mui/material/styles";
-import theme from '../styles/muiOverrides'
+import { DataGrid, GridColDef, GridColTypeDef, GridRenderCellParams, GridRowSelectionModel } from '@mui/x-data-grid';
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import InputTextField from "@/components/input";
 
 export interface EventsType {
     events: [
@@ -33,8 +33,13 @@ interface TableType {
     link: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>
 }
 
-export default function Results() {
+const darkTheme = createTheme({
+    palette: {
+      mode: 'dark',
+    },
+  });
 
+export default function Results() {
     const artist = useSearchParams().get('artist');
     const [result, setResult] = useState<EventsType>();
     const client_id = "MzYwMTY1NTl8MTY5Mjk5MTEwMy45NDA4NDI5"
@@ -59,6 +64,7 @@ export default function Results() {
             field: 'lowestPrice', 
             headerName: 'Lowest Price',
             flex: 0.8,
+            sortable: false
         },
         {
             field: 'venue',
@@ -87,9 +93,10 @@ export default function Results() {
         let array: TableType[] = []
         result?.events.map((event, index) => {
             const date = event.datetime_local.split('T');
+            const price = event.stats.lowest_price === null ? 'Not Available' : `$${event.stats.lowest_price}`
             array[index] = {
                 id: index,
-                lowestPrice: `$${event.stats.lowest_price}`,
+                lowestPrice: `${price}`,
                 venue: event.venue.name,
                 location: `${event.venue.city}, ${event.venue.state}, ${event.venue.country}`,
                 date: date[0],
@@ -100,16 +107,24 @@ export default function Results() {
         return array;
     };
 
-    const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
+    const [selected, setSelected] = useState<GridRowSelectionModel>([]);
+
+    const buttonClasses = "border px-2 py-1 rounded-sm transition ease-in-out duration-300 border-stone-500 enabled:hover:opacity-80 enabled:hover:bg-orange-700 enabled:hover:text-black"
+    const [targetPrice, setTargetPrice] = useState('');
+    const [email, setEmail] = useState('');
+    const [disableSubmit, setDisableSubmit] = useState(true);
 
     return (
-        <div className="mx-12 my-5 space-y-2">
-            <Link href="/">Home</Link>
+        <div className="md:mx-12 md:my-5 space-y-4">
+            <button disabled={false} className={buttonClasses}>
+                <Link href="/">Search Again</Link>
+            </button>
             <main className="flex space-x-10">
-                <div className="w-6/12">
-                    <ThemeProvider theme={theme}>
+                <div className="min-w-full md:min-w-[60%] space-y-3">
+                    <p className="text-slate-200">Select which events you want to track then enter the price you want and an email to notify you at. You will receive an email when any of the selected events hit the price you want.</p>
+                    <ThemeProvider theme={darkTheme}>
                         <DataGrid
-                            sx={{ color: 'white' }}
+                            autoHeight
                             columns={columns}
                             rows={createRow()}
                             initialState={{
@@ -122,15 +137,71 @@ export default function Results() {
                             getRowHeight={() => 'auto'}
                             checkboxSelection={true}
                             onRowSelectionModelChange={(newRowSelectionModel) => {
-                                setRowSelectionModel(newRowSelectionModel);
+                                setSelected(newRowSelectionModel);
+                                if (!disableSubmit) {
+                                    setDisableSubmit(true);
+                                }
                             }}
-                            rowSelectionModel={rowSelectionModel}
+                            rowSelectionModel={selected}
                         />
                     </ThemeProvider>
                 </div>
-                <form>
-                    <label>Min. Price</label>
-                </form>
+                <div className={`${disableSubmit ? 'opacity-100' : 'opacity-50'} space-y-6 min-w-[15%]`}>
+                    <p className="font-bold text-lg">Selected Events</p>
+                    <ul className="list-disc">
+                    {
+                        result?.events.map((item, index) => {
+                            if (selected.includes(index)) {
+                                return (
+                                    <li key={item.id}>
+                                        <p className="font-semibold">{item.venue.name}</p>
+                                        <div className="flex space-x-2">
+                                            <p>${item.stats.lowest_price}</p>
+                                            <p>{item.datetime_local.split('T')[0]}</p>
+                                        </div>
+                                    </li>
+                                );
+                            }
+                        })
+                    }
+                    </ul>
+                    {
+                        selected.length > 0 
+                        ? ( 
+                            <button 
+                                disabled={!disableSubmit}
+                                className={buttonClasses} 
+                                onClick={() => {
+                                    const array = result?.events.filter((event, index) => selected.includes(index));
+                                    console.log(array);
+                                    setDisableSubmit(false);
+                                }}
+                            >
+                                Next
+                            </button>
+                        ) : <p className="text-stone-300">Select the events you want to track</p>
+                    }
+                </div>
+                <div className={`${disableSubmit ? 'opacity-50' : 'opacity-100'} space-y-6`}>
+                    <p className="font-bold text-lg">Price to Notify</p>
+                    <InputTextField
+                        disabled={disableSubmit}
+                        label="Price"
+                        placeholder="Eg: 85"
+                        onSubmit={event => {console.log(targetPrice)}}
+                        onChange={event => setTargetPrice(event.target.value)}
+                        value={targetPrice}
+                    />
+                    <InputTextField
+                        disabled={disableSubmit}
+                        label="Email"
+                        placeholder="Eg: abcde@gmail.com"
+                        onSubmit={event => {console.log(email)}}
+                        onChange={event => setEmail(event.target.value)}
+                        value={email}
+                    />
+                    <button disabled={disableSubmit} className={buttonClasses} onClick={() => {console.log(targetPrice); console.log(email); console.log(selected)}}>Submit</button>
+                </div>
             </main>
         </div>
     )

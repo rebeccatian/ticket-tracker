@@ -1,13 +1,14 @@
 import { ChangeEventHandler, FormEventHandler, InputHTMLAttributes, useState } from "react";
 
-type TextInputElement = Pick<InputHTMLAttributes<HTMLInputElement>, 'value'| 'onChange'>;
+type TextInputElement = Pick<InputHTMLAttributes<HTMLInputElement>, 'value'| 'onChange' | 'placeholder' | 'disabled'>;
 
 interface InputFieldProps extends TextInputElement {
-    label: string
-    onSubmit: FormEventHandler<HTMLFormElement>
+    label?: string
+    onSubmit?: FormEventHandler<HTMLFormElement>
+    className?: string
 }
 
-export default function InputTextField ({ label, onSubmit, value, onChange } : InputFieldProps) {
+export default function InputTextField ({ label, onSubmit, value, onChange, placeholder, className, disabled } : InputFieldProps) {
     const handleOnSubmit : FormEventHandler<HTMLFormElement> = evt => {
         evt.preventDefault();
         if (onSubmit) {
@@ -20,6 +21,9 @@ export default function InputTextField ({ label, onSubmit, value, onChange } : I
             onChange(evt);
         }
     }
+
+    const inputClassNames = `bg-black text-white border border-1 border-stone-400 p-2 rounded-sm ${className}`
+
     return (
         <div>
             <form onSubmit={handleOnSubmit}>
@@ -30,7 +34,9 @@ export default function InputTextField ({ label, onSubmit, value, onChange } : I
                 </div>
                 <div className="flex">
                     <input
-                        className="bg-black text-white border border-1 border-white p-2"
+                        disabled={disabled}
+                        placeholder={placeholder}
+                        className={inputClassNames}
                         type="text"
                         value={value || ''}
                         onChange={handleOnChange}
