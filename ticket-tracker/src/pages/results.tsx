@@ -1,7 +1,7 @@
 import { useSearchParams } from "next/navigation"
 import Link from "next/link";
 import { AnchorHTMLAttributes, DetailedHTMLProps, useEffect, useState } from "react";
-import { DataGrid, GridColDef, GridColTypeDef, GridRenderCellParams, GridRowSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel } from '@mui/x-data-grid';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import InputTextField from "@/components/input";
 
