@@ -13,9 +13,11 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.8",
     "@mui/x-data-grid": "^6.12.1",
+    "@prisma/client": "^5.3.0",
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
+    "@vercel/postgres": "^0.4.1",
     "autoprefixer": "10.4.15",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
@@ -23,9 +25,11 @@
     "node-cron": "^3.0.2",
     "node-mailer": "^0.1.1",
     "postcss": "8.4.29",
+    "prisma": "^5.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwindcss": "3.3.3",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "vercel": "^32.2.1"
   }
 }
