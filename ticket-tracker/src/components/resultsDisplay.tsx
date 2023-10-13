@@ -1,7 +1,7 @@
 import { DataGrid, GridCallbackDetails, GridRowSelectionModel } from '@mui/x-data-grid';
 import InputTextField from "@/components/input";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { AnchorHTMLAttributes, DetailedHTMLProps, Fragment, MouseEventHandler, useState } from "react";
+import { AnchorHTMLAttributes, ChangeEventHandler, DetailedHTMLProps, Fragment, MouseEventHandler, useState } from "react";
 import { columns } from './colDef';
 import { EventsType, EventType } from '../pages/results';
 
@@ -23,12 +23,18 @@ export interface ResultsProps {
     selected: GridRowSelectionModel;
     disableSubmit?: boolean;
     onSubmitEvents?: MouseEventHandler<HTMLButtonElement>;
+    targetPrice?: string;
+    email?: string;
     onSubmitEmail?: MouseEventHandler<HTMLButtonElement>;
+    onEnterPrice?: ChangeEventHandler<HTMLInputElement>;
+    onEnterEmail?: ChangeEventHandler<HTMLInputElement>
 }
 
 export const buttonClasses = "border px-2 py-1 rounded-sm transition ease-in-out duration-300 border-stone-500 enabled:hover:opacity-80 enabled:hover:bg-orange-700 enabled:hover:text-black";
 
-export default function ResultsDisplay({ result, results, onSelectEvents, selected, disableSubmit, onSubmitEvents }: ResultsProps) {
+export default function ResultsDisplay({ result, results, onSelectEvents, selected, disableSubmit, 
+    onSubmitEvents, onSubmitEmail, targetPrice, email, onEnterPrice, onEnterEmail }
+    : ResultsProps) {
 
     const createRow = () => {
         let array: TableType[] = []
@@ -65,8 +71,6 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
         return array;
     };
 
-    const [targetPrice, setTargetPrice] = useState('');
-    const [email, setEmail] = useState('');
     const profile = results ? true : false
 
     const darkTheme = createTheme({
@@ -149,19 +153,21 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
                                 disabled={disableSubmit}
                                 label="Price"
                                 placeholder="Eg: 85"
-                                onSubmit={event => {console.log(targetPrice)}}
-                                onChange={event => setTargetPrice(event.target.value)}
+                                onChange={onEnterPrice}
                                 value={targetPrice}
                             />
                             <InputTextField
                                 disabled={disableSubmit}
                                 label="Email"
                                 placeholder="Eg: abcde@gmail.com"
-                                onSubmit={event => {console.log(email)}}
-                                onChange={event => setEmail(event.target.value)}
+                                onChange={onEnterEmail}
                                 value={email}
                             />
-                            <button disabled={disableSubmit} className={buttonClasses} onClick={() => {console.log(targetPrice); console.log(email); console.log(selected)}}>Submit</button>
+                            <button 
+                                disabled={disableSubmit} 
+                                className={buttonClasses} 
+                                onClick={onSubmitEmail}
+                            >Submit</button>
                         </div>
                     </Fragment>
                 )
@@ -197,6 +203,7 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
                                         console.log(array);
                                         // setDisableSubmit(false);
                                     }}
+                                    // onClick={onSubmitEmail}
                                 >
                                     Submit
                                 </button>

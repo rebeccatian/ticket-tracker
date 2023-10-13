@@ -46,25 +46,28 @@ export default function Results() {
         }
     }, [artist])
 
-    // const submitData = async (e: React.SyntheticEvent) => {
-    //     e.preventDefault();
-    //     try {
-    //       const body = { email, events };
-    //       await fetch('/api/post', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify(body),
-    //       });
-    //       console.log('success!');
-    //       await Router.push('/index');
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    // };
 
     const [selected, setSelected] = useState<GridRowSelectionModel>([]);
     const [disableSubmit, setDisableSubmit] = useState(true);
     const [events, setEvents] = useState<EventType[]>();
+    const [targetPrice, setTargetPrice] = useState('');
+    const [email, setEmail] = useState('');
+
+    const submitData = async (e: React.SyntheticEvent) => {
+        e.preventDefault();
+        try {
+          const body = { email, events, targetPrice };
+          await fetch('/api/post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          console.log('success!');
+          await Router.push('/');
+        } catch (error) {
+          console.error(error);
+        }
+    };
 
     return (
         <div className="md:mx-12 md:my-5 space-y-4">
@@ -83,6 +86,11 @@ export default function Results() {
                     setEvents(result?.events.filter((event, index) => selected.includes(index)));
                     setDisableSubmit(false);
                 }}
+                onEnterPrice={event => setTargetPrice(event.target.value)}
+                onEnterEmail={event => setEmail(event.target.value)}
+                email={email}
+                targetPrice={targetPrice}
+                onSubmitEmail={submitData}
             />
         </div>
     )
