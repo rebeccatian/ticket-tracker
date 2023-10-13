@@ -28,11 +28,11 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
 
     async function fetchData(selectedEvents) {
 
-        Promise.all(selectedEvents.events.map((event: Event, index: number) => {
+        Promise.all(selectedEvents.events.map(async (event: Event, index: number) => {
             const { id } = event;
-            return fetch(`https://api.seatgeek.com/2/events?client_id=${client_id}&id=${id}`)
-                .then(data => data.json())
-                .then(data => testing[index] = data)
+            const data = await fetch(`https://api.seatgeek.com/2/events?client_id=${client_id}&id=${id}`);
+            const data_1 = await data.json();
+            return testing[index] = data_1;
         })).then(data => setResults(testing))
     }
 
@@ -49,7 +49,7 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
             </button>
             <h1>Your Events</h1>
             {
-                results.length > 1 
+                results?.length > 1 
                 ? (
                     <ResultsDisplay results={results}/>
                 )

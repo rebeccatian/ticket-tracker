@@ -2,28 +2,30 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ResultsDisplay, { buttonClasses } from "@/components/resultsDisplay";
+import Router from "next/router";
+import { GridRowSelectionModel } from "@mui/x-data-grid/models";
 
 
 export interface EventsType {
-    events: [
+    events: EventType[]
+}
+
+export interface EventType {
+    id: string,
+    stats: {
+        lowest_price: number
+    },
+    datetime_local: string,
+    venue: {
+        name: string,
+        city: string,
+        country: string,
+        state: string
+    },
+    url: string,
+    performers: [
         {
-            id: string,
-            stats: {
-                lowest_price: number
-            },
-            datetime_local: string,
-            venue: {
-                name: string,
-                city: string,
-                country: string,
-                state: string
-            },
-            url: string,
-            performers: [
-                {
-                    name: string
-                }
-            ]
+            name: string
         }
     ]
 }
@@ -44,10 +46,44 @@ export default function Results() {
         }
     }, [artist])
 
+    // const submitData = async (e: React.SyntheticEvent) => {
+    //     e.preventDefault();
+    //     try {
+    //       const body = { email, events };
+    //       await fetch('/api/post', {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify(body),
+    //       });
+    //       console.log('success!');
+    //       await Router.push('/index');
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    // };
+
+    const [selected, setSelected] = useState<GridRowSelectionModel>([]);
+    const [disableSubmit, setDisableSubmit] = useState(true);
+    const [events, setEvents] = useState<EventType[]>();
+
     return (
         <div className="md:mx-12 md:my-5 space-y-4">
             <Link className={buttonClasses}href="/">Search Again</Link>
-            <ResultsDisplay result={result} />
+            <ResultsDisplay 
+                result={result}
+                onSelectEvents={(newRowSelectionModel) => {
+                    setSelected(newRowSelectionModel);
+                    if (!disableSubmit) {
+                        setDisableSubmit(true);
+                    }
+                }}
+                selected={selected}
+                disableSubmit={disableSubmit}
+                onSubmitEvents={() => {
+                    setEvents(result?.events.filter((event, index) => selected.includes(index)));
+                    setDisableSubmit(false);
+                }}
+            />
         </div>
     )
 

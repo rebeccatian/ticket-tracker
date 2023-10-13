@@ -1,61 +1,34 @@
-import { EventsType } from "@/pages/results";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridCallbackDetails, GridRowSelectionModel } from '@mui/x-data-grid';
 import InputTextField from "@/components/input";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { AnchorHTMLAttributes, DetailedHTMLProps, Fragment, useState } from "react";
+import { AnchorHTMLAttributes, DetailedHTMLProps, Fragment, MouseEventHandler, useState } from "react";
+import { columns } from './colDef';
+import { EventsType, EventType } from '../pages/results';
 
 
 export interface TableType {
-    id: number,
-    lowestPrice: string,
-    artist?: string,
-    venue: string,
-    location: string,
-    date: string,
-    link: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>
+    id: number;
+    lowestPrice: string;
+    artist?: string;
+    venue: string;
+    location: string;
+    date: string;
+    link: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>;
+}
+
+export interface ResultsProps {
+    result?: EventsType;
+    results?: EventsType[];
+    onSelectEvents?: (rowSelectionModel: GridRowSelectionModel, details: GridCallbackDetails<any>) => void;
+    selected: GridRowSelectionModel;
+    disableSubmit?: boolean;
+    onSubmitEvents?: MouseEventHandler<HTMLButtonElement>;
+    onSubmitEmail?: MouseEventHandler<HTMLButtonElement>;
 }
 
 export const buttonClasses = "border px-2 py-1 rounded-sm transition ease-in-out duration-300 border-stone-500 enabled:hover:opacity-80 enabled:hover:bg-orange-700 enabled:hover:text-black";
 
-export default function ResultsDisplay({ result, results }: {result?: EventsType, results?: EventsType[]}) {
-    const renderLink = (data: GridRenderCellParams<EventsType>) => {
-        return <a className="underline text-orange-700" href={data.value?.url}>SeatGeek Link</a>
-    }
-
-    const columns: GridColDef[] = [
-        { 
-            field: 'lowestPrice', 
-            headerName: 'Lowest Price',
-            flex: 0.8,
-            sortable: false
-        },
-        {
-            field: 'artist',
-            headerName: 'Artist',
-            flex: 1,
-        },
-        {
-            field: 'venue',
-            headerName: 'Venue',
-            flex: 1,
-        },
-        {
-            field: 'location',
-            headerName: 'Location',
-            flex: 1,
-        },
-        {
-            field: 'date',
-            headerName: 'Date',
-            flex: 0.5,
-        },
-        {
-            field: 'link',
-            headerName: 'Link',
-            renderCell: renderLink,
-            flex: 1,
-        }
-      ];
+export default function ResultsDisplay({ result, results, onSelectEvents, selected, disableSubmit, onSubmitEvents }: ResultsProps) {
 
     const createRow = () => {
         let array: TableType[] = []
@@ -92,10 +65,8 @@ export default function ResultsDisplay({ result, results }: {result?: EventsType
         return array;
     };
 
-    const [selected, setSelected] = useState<GridRowSelectionModel>([]);
     const [targetPrice, setTargetPrice] = useState('');
     const [email, setEmail] = useState('');
-    const [disableSubmit, setDisableSubmit] = useState(true);
     const profile = results ? true : false
 
     const darkTheme = createTheme({
@@ -128,12 +99,7 @@ export default function ResultsDisplay({ result, results }: {result?: EventsType
                         }}
                         getRowHeight={() => 'auto'}
                         checkboxSelection={true}
-                        onRowSelectionModelChange={(newRowSelectionModel) => {
-                            setSelected(newRowSelectionModel);
-                            if (!disableSubmit) {
-                                setDisableSubmit(true);
-                            }
-                        }}
+                        onRowSelectionModelChange={onSelectEvents}
                         rowSelectionModel={selected}
                         columnVisibilityModel={{
                             artist: profile
@@ -170,11 +136,7 @@ export default function ResultsDisplay({ result, results }: {result?: EventsType
                                     <button 
                                         disabled={!disableSubmit}
                                         className={buttonClasses} 
-                                        onClick={() => {
-                                            const array = result?.events.filter((event, index) => selected.includes(index));
-                                            console.log(array);
-                                            setDisableSubmit(false);
-                                        }}
+                                        onClick={onSubmitEvents}
                                     >
                                         Next
                                     </button>
@@ -209,7 +171,7 @@ export default function ResultsDisplay({ result, results }: {result?: EventsType
                         <ul className="list-disc">
                         {
                             results.map((obj, index) => {
-                                if (selected.includes(index)) {
+                                if (selected?.includes(index)) {
                                     return (
                                         <li key={obj.events[0].id}>
                                             <p className="font-semibold">{obj.events[0].performers[0].name}</p>
@@ -225,15 +187,15 @@ export default function ResultsDisplay({ result, results }: {result?: EventsType
                         }
                         </ul>
                         {
-                            selected.length > 0 
+                            selected?.length > 0 
                             ? ( 
-                                <button 
+                                <button
                                     disabled={!disableSubmit}
                                     className={buttonClasses} 
                                     onClick={() => {
-                                        const array = result?.events.filter((event, index) => selected.includes(index));
+                                        const array = results?.filter((event, index) => selected.includes(index));
                                         console.log(array);
-                                        setDisableSubmit(false);
+                                        // setDisableSubmit(false);
                                     }}
                                 >
                                     Submit
