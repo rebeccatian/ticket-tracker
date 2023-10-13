@@ -173,7 +173,13 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
                 )
                 : (
                     <div className={`${disableSubmit ? 'opacity-100' : 'opacity-50'} space-y-6 min-w-[15%]`}>
-                        <p className="font-bold text-lg">Unfollowed Events</p>
+                        <p className="font-bold text-lg">Update Events and Price</p>
+                        <InputTextField
+                            label="Price"
+                            placeholder="Eg: 85"
+                            onChange={onEnterPrice}
+                            value={targetPrice}
+                        />
                         <ul className="list-disc">
                         {
                             results.map((obj, index) => {
@@ -192,23 +198,14 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
                             })
                         }
                         </ul>
-                        {
-                            selected?.length > 0 
-                            ? ( 
-                                <button
-                                    disabled={!disableSubmit}
-                                    className={buttonClasses} 
-                                    onClick={() => {
-                                        const array = results?.filter((event, index) => selected.includes(index));
-                                        console.log(array);
-                                        // setDisableSubmit(false);
-                                    }}
-                                    // onClick={onSubmitEmail}
-                                >
-                                    Submit
-                                </button>
-                            ) : <p className="text-stone-300">Select the events you want to untrack</p>
-                        }
+                        <p className={selected?.length > 0 ? 'hidden' : 'text-stone-300'}>Select the events you want to untrack</p>
+                        <button
+                            disabled={!disableSubmit}
+                            className={buttonClasses} 
+                            onClick={onSubmitEmail}
+                        >
+                            Submit
+                        </button>
                     </div>
                 )
             }

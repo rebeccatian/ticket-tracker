@@ -1,16 +1,14 @@
 import prisma from '../../../../lib/prisma';
 
-// POST /api/post
+// DELETE /api/delete
 export default async function handle(req, res) {
     const { email, inputEvents } = req.body;
 
-    const result = await prisma.user.create({
+    const result = await prisma.user.update({
+        where: {email: email},
         data: {
-            email: email,
             events: {
-                createMany: {
-                    data: inputEvents
-                }
+                deleteMany: inputEvents
             }
         }
     });
