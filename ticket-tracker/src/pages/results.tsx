@@ -55,8 +55,17 @@ export default function Results() {
 
     const submitData = async (e: React.SyntheticEvent) => {
         e.preventDefault();
+
+        const inputEvents = events.map(item => {
+            return {
+                id: item.id.toString(), 
+                price: item.stats.lowest_price,
+                targetPrice: parseInt(targetPrice)
+            }
+        })
+
         try {
-          const body = { email, events, targetPrice };
+          const body = { email, inputEvents };
           await fetch('/api/post', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

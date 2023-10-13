@@ -1,29 +1,21 @@
 import prisma from '../../../../lib/prisma';
+import Prism, { Prisma } from '@prisma/client';
 
 // POST /api/post
 // Required fields in body: title
 // Optional fields in body: content
 export default async function handle(req, res) {
-  const { email } = req.body;
+    const { email, inputEvents } = req.body;
 
-//   events.array.forEach(element => {
-//     console.log(element);
-//   });
-
-  const result = await prisma.user.create({
-    data: {
-      email: email
-    //   events: {
-    //     createMany({
-    //         data: [
-    //             { name: 'Bob', email: 'bob@prisma.io' },
-    //             { name: 'Bobo', email: 'bob@prisma.io' }, // Duplicate unique key!
-    //             { name: 'Yewande', email: 'yewande@prisma.io' },
-    //             { name: 'Angelique', email: 'angelique@prisma.io' },
-    //         ]
-    //     })
-    //   }
-    }
-  });
-  res.json(result);
+    const result = await prisma.user.create({
+        data: {
+            email: email,
+            events: {
+                createMany: {
+                    data: inputEvents
+                }
+            }
+        }
+    });
+    res.json(result);
 }
