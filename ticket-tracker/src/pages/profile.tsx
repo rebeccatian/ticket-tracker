@@ -14,7 +14,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           email: String(context.query.email),
         },
         include: {
-            events: true
+            events: true,
         }
     });
     return {
