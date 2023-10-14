@@ -11,7 +11,8 @@ datasource db {
 }
 
 model Event {
-  id        String     @unique
+  id         String     @default(cuid()) @id
+  eventId    String
   price     Int
   author    User?   @relation(fields: [authorEmail], references: [email])
   authorEmail  String?

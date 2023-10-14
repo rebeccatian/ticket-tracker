@@ -1,7 +1,7 @@
 import { DataGrid, GridCallbackDetails, GridRowSelectionModel } from '@mui/x-data-grid';
 import InputTextField from "@/components/input";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { AnchorHTMLAttributes, ChangeEventHandler, DetailedHTMLProps, Fragment, MouseEventHandler, useState } from "react";
+import { AnchorHTMLAttributes, ChangeEventHandler, DetailedHTMLProps, FormEventHandler, Fragment, MouseEventHandler, useState } from "react";
 import { columns } from './colDef';
 import { EventsType, EventType } from '../pages/results';
 
@@ -25,7 +25,7 @@ export interface ResultsProps {
     onSubmitEvents?: MouseEventHandler<HTMLButtonElement>;
     targetPrice?: string;
     email?: string;
-    onSubmitEmail?: MouseEventHandler<HTMLButtonElement>;
+    onSubmitEmail?: MouseEventHandler<HTMLButtonElement> | FormEventHandler<HTMLFormElement>;
     onEnterPrice?: ChangeEventHandler<HTMLInputElement>;
     onEnterEmail?: ChangeEventHandler<HTMLInputElement>
 }
@@ -161,24 +161,26 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
                                 label="Email"
                                 placeholder="Eg: abcde@gmail.com"
                                 onChange={onEnterEmail}
+                                onSubmit={onSubmitEmail as FormEventHandler<HTMLFormElement>}
                                 value={email}
                             />
                             <button 
                                 disabled={disableSubmit} 
                                 className={buttonClasses} 
-                                onClick={onSubmitEmail}
+                                onClick={onSubmitEmail as MouseEventHandler<HTMLButtonElement>}
                             >Submit</button>
                         </div>
                     </Fragment>
                 )
                 : (
                     <div className={`${disableSubmit ? 'opacity-100' : 'opacity-50'} space-y-6 min-w-[15%]`}>
-                        <p className="font-bold text-lg">Update Events and Price</p>
+                        <p className="font-bold text-lg">Remove Events and Update Price</p>
                         <InputTextField
                             label="Price"
                             placeholder="Eg: 85"
                             onChange={onEnterPrice}
                             value={targetPrice}
+                            onSubmit={onSubmitEmail as FormEventHandler<HTMLFormElement>}
                         />
                         <ul className="list-disc">
                         {
@@ -202,7 +204,7 @@ export default function ResultsDisplay({ result, results, onSelectEvents, select
                         <button
                             disabled={!disableSubmit}
                             className={buttonClasses} 
-                            onClick={onSubmitEmail}
+                            onClick={onSubmitEmail as MouseEventHandler<HTMLButtonElement>}
                         >
                             Submit
                         </button>

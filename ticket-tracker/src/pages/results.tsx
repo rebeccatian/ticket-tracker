@@ -58,7 +58,7 @@ export default function Results() {
 
         const inputEvents = events.map(item => {
             return {
-                id: item.id.toString(), 
+                eventId: item.id.toString(), 
                 price: item.stats.lowest_price,
                 targetPrice: parseInt(targetPrice)
             }

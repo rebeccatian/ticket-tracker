@@ -2,7 +2,6 @@ import { Inter } from 'next/font/google'
 import InputTextField from '../components/input';
 import { useRouter, usePathname} from 'next/navigation';
 import { ChangeEventHandler, FormEventHandler, useState } from 'react';
-import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,7 +31,7 @@ export default function Home() {
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
+      className={`flex flex-col space-y-12 p-24 ${inter.className}`}
     >
       <InputTextField 
         label="Enter an artist"
@@ -40,12 +39,15 @@ export default function Home() {
         onChange={handleOnChange}
         value={value}
       />
-      <InputTextField 
-        label="Enter an email"
-        onSubmit={handleEmailSubmit}
-        onChange={handleEmailChange}
-        value={email}
-      />
+      <div className={email ? 'opacity-100' : 'opacity-70'}>
+        <p>Already have selected events?</p>
+        <InputTextField 
+          label="Enter an email"
+          onSubmit={handleEmailSubmit}
+          onChange={handleEmailChange}
+          value={email}
+        />
+      </div>
     </main>
   )
 }

@@ -4,7 +4,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import prisma from '../../lib/prisma';
-import { EventsType, EventType } from './results';
+import { EventsType } from './results';
 import { GridRowSelectionModel } from '@mui/x-data-grid/models/gridRowSelectionModel';
 import Router from 'next/router';
 
@@ -30,57 +30,98 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
     async function fetchData(selectedEvents) {
 
         Promise.all(selectedEvents.events.map(async (event: Event, index: number) => {
-            const { id } = event;
-            const data = await fetch(`https://api.seatgeek.com/2/events?client_id=${client_id}&id=${id}`);
+            const { eventId } = event;
+            const data = await fetch(`https://api.seatgeek.com/2/events?client_id=${client_id}&id=${eventId}`);
             const data_1 = await data.json();
-            return testing[index] = data_1;
+            testing[index] = data_1;
+            console.log(testing)
+            return testing
         })).then(data => setResults(testing))
     }
 
 
     useEffect(() => {
         fetchData(selectedUser).catch(console.error);
-        console.log(results);
     }, [])
 
     const [selected, setSelected] = useState<GridRowSelectionModel>([]);
     const [disableSubmit, setDisableSubmit] = useState(true);
     const [targetPrice, setTargetPrice] = useState('');
 
-    const updateData = async (e: React.SyntheticEvent, events: EventsType[]) => {
+    const updateData = async (e: React.SyntheticEvent, events?: EventsType[]) => {
         e.preventDefault();
         const email = window.location.search.split('=')[1]
+        console.log(events.length)
 
-        const inputEvents = events.map(item => {
-            return {
-                id: item.events[0].id.toString(), 
-                price: item.events[0].stats.lowest_price,
-                targetPrice: parseInt(targetPrice)
+        if (events.length > 0 && targetPrice) {
+            console.log('first')
+            const inputEvents = events.map(item => {
+                return {
+                    eventId: item.events[0].id.toString(), 
+                    price: item.events[0].stats.lowest_price,
+                    targetPrice: parseInt(targetPrice)
+                }
+            })
+            const body = { email, inputEvents };
+            try {
+                await fetch('/api/put', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(body)
+                });
+      
+            } catch (error) {
+                console.error(error);
             }
-        })
-
-        const body = { email, inputEvents };
-
-        try {
-          await fetch('/api/put', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-          });
-          console.log('update price success!');
-        } catch (error) {
-          console.error(error);
+      
+            try {
+                  await fetch('/api/delete', {
+                      method: 'DELETE',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(body)
+                  });
+                  await Router.push('/');
+            } catch (error) {
+                  console.error(error);
+            }
+        }
+        else if (events.length > 0 && !targetPrice) {
+            console.log('second')
+            const inputEvents = events.map(item => {
+                return {
+                    eventId: item.events[0].id.toString(), 
+                    price: item.events[0].stats.lowest_price,
+                }
+            })
+            const body = { email, inputEvents };
+            try {
+                await fetch('/api/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                await Router.push('/');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        else if (events.length === 0 && targetPrice) {
+            console.log('right')
+            const inputPrice = parseInt(targetPrice) 
+            const body = { email, inputPrice};
+            try {
+                await fetch('/api/put', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(body)
+                });
+                await Router.push('/');
+            } catch (error) {
+                console.error(error);
+            }
         }
 
-        try {
-            await fetch('/api/delete', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-        } catch (error) {
-            console.error(error);
-        }
+
     };
 
     return (
@@ -90,7 +131,7 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
             </button>
             <h1>Your Events</h1>
             {
-                results?.length > 1 
+                results?.length >= 1 
                 ? (
                     <ResultsDisplay 
                         selected={selected} 
@@ -105,6 +146,7 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
                         onEnterPrice={event => setTargetPrice(event.target.value)}
                         onSubmitEmail={event => {
                             const array = results.filter((obj, index) => selected.includes(index));
+                            console.log(targetPrice);
                             updateData(event, array);
                         }}
                         targetPrice={targetPrice}
