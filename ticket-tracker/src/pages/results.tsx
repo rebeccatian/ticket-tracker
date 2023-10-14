@@ -41,7 +41,6 @@ export default function Results() {
             .then(response => response.json())
             .then(data => {
                 setResult(data);
-                console.log(data);
             })
         }
     }, [artist])
@@ -65,16 +64,15 @@ export default function Results() {
         })
 
         try {
-          const body = { email, inputEvents };
-          await fetch('/api/post', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-          });
-          console.log('success!');
-          await Router.push('/');
+            const body = { email, inputEvents };
+            await fetch('/api/post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            await Router.push('/');
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
     };
 

@@ -34,7 +34,6 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
             const data = await fetch(`https://api.seatgeek.com/2/events?client_id=${client_id}&id=${eventId}`);
             const data_1 = await data.json();
             testing[index] = data_1;
-            console.log(testing)
             return testing
         })).then(data => setResults(testing))
     }
@@ -51,10 +50,8 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
     const updateData = async (e: React.SyntheticEvent, events?: EventsType[]) => {
         e.preventDefault();
         const email = window.location.search.split('=')[1]
-        console.log(events.length)
 
         if (events.length > 0 && targetPrice) {
-            console.log('first')
             const inputEvents = events.map(item => {
                 return {
                     eventId: item.events[0].id.toString(), 
@@ -86,7 +83,6 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
             }
         }
         else if (events.length > 0 && !targetPrice) {
-            console.log('second')
             const inputEvents = events.map(item => {
                 return {
                     eventId: item.events[0].id.toString(), 
@@ -106,7 +102,6 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
             }
         }
         else if (events.length === 0 && targetPrice) {
-            console.log('right')
             const inputPrice = parseInt(targetPrice) 
             const body = { email, inputPrice};
             try {
@@ -146,7 +141,6 @@ export default function Profile ({ selectedUser } : InferGetServerSidePropsType<
                         onEnterPrice={event => setTargetPrice(event.target.value)}
                         onSubmitEmail={event => {
                             const array = results.filter((obj, index) => selected.includes(index));
-                            console.log(targetPrice);
                             updateData(event, array);
                         }}
                         targetPrice={targetPrice}

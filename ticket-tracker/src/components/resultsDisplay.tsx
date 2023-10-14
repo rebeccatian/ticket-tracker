@@ -3,7 +3,7 @@ import InputTextField from "@/components/input";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { AnchorHTMLAttributes, ChangeEventHandler, DetailedHTMLProps, FormEventHandler, Fragment, MouseEventHandler, useState } from "react";
 import { columns } from './colDef';
-import { EventsType, EventType } from '../pages/results';
+import { EventsType } from '../pages/results';
 
 
 export interface TableType {
